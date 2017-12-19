@@ -69,7 +69,7 @@ dveduta@someinternalhost:~$
 
 ## Домашняя работа 06
 
-### Команда для запуска инстанса с использованием startup script
+### Команда для запуска инстанса с использованием локального startup script 
 
 ```
 gcloud compute instances create reddit-app-n2\
@@ -81,4 +81,27 @@ gcloud compute instances create reddit-app-n2\
   --restart-on-failure \
   --zone=europe-west3-b \
   --metadata-from-file startup-script=startup_script.sh
+```
+
+### Команда для запуска инстанса с использованием startup script из gs (предварительно создан региональный сегмент и загружен скрипт)
+
+
+```
+gcloud compute instances create reddit-app-n2\
+  --boot-disk-size=10GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure \
+  --zone=europe-west3-b \
+  --metadata-from-file startup-script-url=https://storage.cloud.google.com/scriptsstartup/startup_script.sh
+```
+
+
+### Вариант со ссылкой типа gs
+
+
+```
+  --metadata-from-file startup-script-url=gs://scriptsstartup/startup_script.sh
 ```
