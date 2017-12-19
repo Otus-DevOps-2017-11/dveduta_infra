@@ -95,7 +95,7 @@ gcloud compute instances create reddit-app-n2\
   --tags puma-server \
   --restart-on-failure \
   --zone=europe-west3-b \
-  --metadata-from-file startup-script-url=https://storage.cloud.google.com/scriptsstartup/startup_script.sh
+  --metadata startup-script-url=https://storage.cloud.google.com/scriptsstartup/startup_script.sh
 ```
 
 
@@ -103,5 +103,13 @@ gcloud compute instances create reddit-app-n2\
 
 
 ```
-  --metadata-from-file startup-script-url=gs://scriptsstartup/startup_script.sh
+  --metadata startup-script-url=gs://scriptsstartup/startup_script.sh
 ```
+
+### Подходит любой общедоступный урл, по которому отдается файл 
+
+
+```
+  --metadata startup-script-url=https://raw.githubusercontent.com/Otus-DevOps-2017-11/dveduta_infra/950f040206fff602dc060fd4b7b705840de054cf/startup_script.sh
+```
+
