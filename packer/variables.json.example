@@ -1,5 +1,9 @@
 {
-      "proj_id": "example_project_id",
-      "src_img_fam": "example_image_family",
-      "type_mach": "f1-micro"
+  "proj_id": "example_project_id",
+  "src_img_fam": "example_image_family",
+  "type_mach": "f1-micro",
+  "d_size": "15",
+  "d_type": "pd-standard",
+  "net_name": "default",
+  "u_tags": "exampletag1,exampletag2"
 }
