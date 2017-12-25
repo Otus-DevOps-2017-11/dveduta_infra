@@ -1,4 +1,12 @@
 {
+  "variables": {
+     "proj_id": null,
+     "src_img_fam": null,
+     "d_size": "10",
+     "d_type": "pd-standard",
+     "net_name": "default",
+     "u_tags": ""
+  },
   "builders": [
     {
     "type": "googlecompute",
@@ -8,7 +16,12 @@
     "source_image_family": "ubuntu-1604-lts",
     "zone": "europe-west1-b",
     "ssh_username": "dveduta",
-    "machine_type": "{{user `type_mach`}}"
+    "machine_type": "{{user `type_mach`}}",
+    "image_description": "{{user `img_desc`}}",
+    "disk_size": "{{user `d_size`}}",
+    "disk_type": "{{user `d_type`}}",
+    "network": "{{user `net_name`}}",
+    "tags": "{{user `u_tags`}}"
     }
   ],
   "provisioners": [
