@@ -1,10 +1,11 @@
 {
   "variables": {
      "proj_id": null,
-     "src_img_fam": null,
+     "src_img_family": null,
      "d_size": "10",
      "d_type": "pd-standard",
      "net_name": "default",
+     "type_mach": "f1-micro",
      "u_tags": ""
   },
   "builders": [
@@ -12,8 +13,8 @@
     "type": "googlecompute",
     "project_id": "{{user `proj_id`}}",
     "image_name": "reddit-base-{{timestamp}}",
-    "image_family": "{{user `src_img_fam`}}",
-    "source_image_family": "ubuntu-1604-lts",
+    "image_family": "reddit-base",
+    "source_image_family": "{{user `src_img_fam`}}",
     "zone": "europe-west1-b",
     "ssh_username": "dveduta",
     "machine_type": "{{user `type_mach`}}",
