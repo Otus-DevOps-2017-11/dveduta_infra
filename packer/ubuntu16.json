@@ -14,7 +14,7 @@
     "project_id": "{{user `proj_id`}}",
     "image_name": "reddit-base-{{timestamp}}",
     "image_family": "reddit-base",
-    "source_image_family": "{{user `src_img_fam`}}",
+    "source_image_family": "{{user `src_img_family`}}",
     "zone": "europe-west1-b",
     "ssh_username": "dveduta",
     "machine_type": "{{user `type_mach`}}",
