@@ -1,7 +1,7 @@
 provider "google" {
     version = "1.4.0"
-    project = "beaming-pillar-188917"
-    region = "europe-west1"
+    project = "${var.project}"
+    region = "${var.region}"
 }
 
 resource "google_compute_instance" "app" {
@@ -11,7 +11,7 @@ resource "google_compute_instance" "app" {
     tags = ["reddit-app"]
     boot_disk {
         initialize_params {
-            image = "reddit-base"
+            image = "${var.disk_image}"
         }
     }
     network_interface {
@@ -20,7 +20,7 @@ resource "google_compute_instance" "app" {
     }
 
     metadata {
-        sshKeys = "dveduta:${file("~/.ssh/dveduta.pub")}"
+        sshKeys = "dveduta:${file(var.public_key_path)}"
     }
 
     connection {
