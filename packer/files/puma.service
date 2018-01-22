@@ -1,0 +1,14 @@
+[Unit]
+Description=Puma HTTP Server for reddit app
+After=network.target
+
+[Service]
+Type=simple
+User=dveduta
+WorkingDirectory=/home/dveduta/reddit
+ExecStart=/usr/bin/bundle exec puma
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

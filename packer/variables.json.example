@@ -1,0 +1,9 @@
+{
+  "proj_id": "beaming-pillar-188917",
+  "src_img_family": "ubuntu-1604-lts",
+  "type_mach": "f1-micro",
+  "d_size": "15",
+  "d_type": "pd-standard",
+  "net_name": "default",
+  "u_tags": "puma-server"
+}
