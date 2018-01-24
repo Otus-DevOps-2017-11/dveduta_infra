@@ -28,3 +28,4 @@ terraform init
  * Проверка шаблона - terraform plan
  * Удаление всего, описанного в tf-файлах - terraform destroy
  * Пометить для пересоздания - terrafom taint resource_name
+ * Переформатировать шаблоны (== выставить отступы, что очень круто) - terraform fmt
