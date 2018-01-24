@@ -1,0 +1,6 @@
+project = "your-project-id"
+region = "europe-west1"
+instance_zone = "europe-west1-b"
+public_key_path = "~/.ssh/sshkey.pub"
+private_key_path = "~/.ssh/sshkey"
+disk_image = "reddit-base"
