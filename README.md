@@ -264,3 +264,80 @@ module "storage-bucket" {
 }
 ```
 Данные имена gcp отказался принимать - сказал есть совпадающие названия. Пришлось переименовать в sbt и sbt2
+
+## Домашняя работа 10
+
+```
+yaourt -Qs ansible
+community/ansible 2.4.3.0-1
+    Radically simple IT automation platform
+community/ansible-lint 3.4.20-1
+    Checks playbooks for practices and behaviour that could potentially be improved.
+```
+requirements не пригодился, но добавлен.
+
+ * Создали inventory файл с данными об appserver и dbserver, а также описании подключения (пользователь и ключ)
+ * Создали ansible.cfg и вынесли в него общие настройки - учетные данные для подключения, inventory-файл, отключение проверки ключей хостов (ssh-keygen -R временно не нужен, да)
+ * Описали две группы хостов (по одному серверу в каждой) и научились призывать как каждую группу по отдельности, так и всё сразу
+ * Сделали inventory в формате yml
+
+---
+ Сделать задание со '*' - inventory в формате json и по примеру https://medium.com/@Nklya/%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5-%D0%B8%D0%BD%D0%B2%D0%B5%D0%BD%D1%82%D0%BE%D1%80%D0%B8-%D0%B2-ansible-9ee880d540d6 не удалось - попытка представлена в inventory_2.json. Полный текст ошибки:
+ ```
+ [WARNING]:  * Failed to parse dveduta_infra/ansible/inventory_2.json with yaml plugin: Invalid children entry for all group, requires a dictionary, found <type 'list'> instead.
+ ```
+ Пример по ссылке выдает аналогичную ошибку.
+ Неканоничный, но рабочий вариант - в inventory.json
+
+---
+* Выполнение команд
+
+```
+ansible app -m command -a 'ruby -v'
+appserver | SUCCESS | rc=0 >>
+ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+```
+
+```
+ansible app -m command -a 'bundler -v'
+appserver | SUCCESS | rc=0 >>
+Bundler version 1.11.2
+```
+
+```
+ansible app -m shell -a 'ruby -v; bundler -v'
+appserver | SUCCESS | rc=0 >>
+ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+Bundler version 1.11.2
+```
+
+```
+ansible db -m service -a name=mongod
+dbserver | SUCCESS => {
+    "changed": false,
+    "name": "mongod",
+    "status": {
+        "ActiveEnterTimestamp": "Mon 2018-02-05 18:54:16 UTC",
+        "ActiveEnterTimestampMonotonic": "13380839",
+        "ActiveExitTimestampMonotonic": "0",
+        "ActiveState": "active",
+        "After": "sysinit.target basic.target system.slice systemd-journald.socket network.target",
+        "AllowIsolate": "no",
+        "AmbientCapabilities": "0",
+        "AssertResult": "yes",
+...
+```
+
+```
+ ansible app -m git -a 'repo=https://github.com/Otus-DevOps-2017-11/reddit.git dest=/home/dveduta/reddit'
+ appserver | SUCCESS => {
+     "after": "61a7f75b3d3e6f7a8f279896fb4e9f0556e1a70a",
+     "before": null,
+     "changed": true
+ }
+```
+```
+ansible app -m command -a 'git clone https://github.com/Otus-DevOps-2017-11/reddit.git /home/dveduta/reddit'
+appserver | FAILED | rc=128 >>
+fatal: destination path '/home/dveduta/reddit' already exists and is not an empty directory.non-zero return code
+```
