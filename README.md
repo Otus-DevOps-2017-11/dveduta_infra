@@ -20,7 +20,7 @@ Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.10.0-42-generic x86_64)
 
 
 Last login: Wed Dec 13 18:08:58 2017 from 10.156.0.2
-dveduta@someinternalhost:~$ 
+dveduta@someinternalhost:~$
 ```
 
 Однокомандное подключение через алиас internalhost:
@@ -53,19 +53,19 @@ Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.10.0-42-generic x86_64)
 
 
 Last login: Wed Dec 13 18:18:05 2017 from 10.156.0.2
-dveduta@someinternalhost:~$ 
+dveduta@someinternalhost:~$
 ```
 
 ---
 
 Хост bastion, IP: 35.198.86.41, внутр. IP: 10.156.0.2.
-Хост: someinternalhost, внутр. IP: 10.156.0.3 
+Хост: someinternalhost, внутр. IP: 10.156.0.3
 
 Примечание: для корректного поведения сети удалил маршрут 0.0.0.0/0 из впн сервера, добавил маршрут 10.156.0.0/24 , запретил клиенту использовать впн как маршрут по умолчанию.
 
 ## Домашняя работа 06
 
-### Команда для запуска инстанса с использованием локального startup script 
+### Команда для запуска инстанса с использованием локального startup script
 
 ```
 gcloud compute instances create reddit-app-n2\
@@ -102,7 +102,7 @@ gcloud compute instances create reddit-app-n2\
   --metadata startup-script-url=gs://scriptsstartup/startup_script.sh
 ```
 
-### Подходит любой общедоступный урл, по которому отдается файл 
+### Подходит любой общедоступный урл, по которому отдается файл
 
 
 ```
@@ -132,22 +132,22 @@ gcloud compute instances create reddit-app-n2\
 ### Проверка
 #### Без параметров
 ```
-packer validate ./ubuntu16.json 
+packer validate ./ubuntu16.json
 ```
 #### С параметрами
 ```
-packer validate -var-file=variables.json ./ubuntu16.json 
+packer validate -var-file=variables.json ./ubuntu16.json
 ```
 
 ### Сборка
 ```
-packer build -var-file=variables.json ./ubuntu16.json 
+packer build -var-file=variables.json ./ubuntu16.json
 ```
 
 ### * immutable, сборка
 Аналогичным образом
 ```
-packer build -var-file=variables.json ./immutable.json 
+packer build -var-file=variables.json ./immutable.json
 ```
 В качестве параметров, помимо proj_id (project_id) src_img_family (source_image_family), можно указать
 
@@ -190,3 +190,77 @@ terraform init
  * Пометить для пересоздания - terrafom taint resource_name
  * Переформатировать шаблоны (== выставить отступы, что очень круто) - terraform fmt
 
+## Домашняя работа 09
+
+ * Изучили: Terrafom умеет переопределять дефолтные правила файерволла. Однако для этого требуется импортировать желаемое правило в созданное нами
+
+```
+terraform import google_compute_firewall.firewall_ssh default-allow-ssh
+```
+
+ * Изучили: Terraform логично работает с неявными зависимостями ресурсов. Например, если создать ресурс ip адреса google_compute_address с названием app_ip и затем использовать его в описании сетевого интерфейса ресурса виртуалки
+
+ ```
+ network_interface {
+ network = "default"
+ access_config = {
+ nat_ip = "${google_compute_address.app_ip.address}"
+ }
+ }
+ ```
+то tf сначала создаст ресурс адреса, и только после этого - виртуалку, с использованием созданного айпишника.
+
+ * Далее шаблон ubuntu16.json для packer, созданный в предыдущем ДЗ, распилили на две отдельные сущности - приложение app.json и базу данных db.json
+
+ * Распилили конфиг main.tf также на две сущности для приложения и БД
+   * при этом добавили правила файерволла для app (разрешение подключаться на порт 9292 для всех) и db (разрешение подключаться на порт БД 27017 только для виртуалок с тегом reddit-app)
+   * Семейства образов для виртуалок передаются в виде переменных (app_disk_image db_disk_image) с соответствующими дефолтными значениями (reddit-app-base reddit-db-base)
+ * Вынесли в отдельный конфиг vpc.tf правило файерволла для ssh.
+ Итого в исходном файле осталось только определение провайдера
+ ```
+ provider "google" {
+ version = "1.4.0"
+ project = "${var.project}"
+ region = "${var.region}"
+}
+```
+
+Созданные конфиги есть практически готовые модули.
+Чтобы сделать их реальными модулями - раскладываем по папкам с переименованием (module/<modulename>/main.tf) - так будет удобнее работать.
+
+Также для конвертации в полноценные модули задаем/переносим переменные, которые необходимы им для работы (ключ, зона и образ для app и db; диапазон разрешенных адресов для входящих запросов для vpc)
+
+В модуле app у нас определена выходная переменная app_external_ip.
+Чтобы получить её значение в основной части конфига используем конструкцию
+```
+output "app_external_ip" {
+  value = "${module.app.app_external_ip}"
+}
+```
+При этом в app остается исходная конструкция
+```
+output "app_external_ip" {
+  value = "${google_compute_instance.app.network_interface.0.access_config.0.assigned_nat_ip}"
+}
+```
+
+Далее, разделяем определяем два окружения - stage и prod: переносим конфиги в папки, исправляем пути до модулей.
+
+Если скопировать всё кроме модулей - будет достаточно `terraform get` для подготовки окружения к работе.
+
+Если же не скопировать terraform.tfstate - то потребуется полная инициализация `terrafom init`.
+
+Логично, при "боевом" создании окружений разделить stage и prod в том числе и по namespace, поскольку при текущей конфигурации stage и prod работают с одними и теми же виртуалками.
+
+---
+
+Готовые модули для terrafom можно найти в https://registry.terraform.io/
+Подключаются аналогичным образом.
+```
+module "storage-bucket" {
+ source = "SweetOps/storage-bucket/google"
+ version = "0.1.1"
+ name = ["storage-bucket-test", "storage-bucket-test2"]
+}
+```
+Данные имена gcp отказался принимать - сказал есть совпадающие названия. Пришлось переименовать в sbt и sbt2
