@@ -1,0 +1,36 @@
+{
+  "variables": {
+     "proj_id": null,
+     "src_img_family": null,
+     "d_size": "10",
+     "d_type": "pd-standard",
+     "net_name": "default",
+     "type_mach": "f1-micro",
+     "u_tags": "",
+     "image_description": "Ubuntu 16 with db for reddit-app"
+  },
+  "builders": [
+    {
+    "type": "googlecompute",
+    "project_id": "{{user `proj_id`}}",
+    "image_name": "reddit-db-base-{{timestamp}}",
+    "image_family": "reddit-db-base",
+    "source_image_family": "{{user `src_img_family`}}",
+    "zone": "europe-west1-b",
+    "ssh_username": "dveduta",
+    "machine_type": "{{user `type_mach`}}",
+    "image_description": "{{user `img_desc`}}",
+    "disk_size": "{{user `d_size`}}",
+    "disk_type": "{{user `d_type`}}",
+    "network": "{{user `net_name`}}",
+    "tags": "{{user `u_tags`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "scripts/install_mongodb.sh",
+      "execute_command": "sudo {{.Path}}"
+    }
+  ]
+}
