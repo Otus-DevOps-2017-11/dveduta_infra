@@ -359,6 +359,7 @@ fatal: destination path '/home/dveduta/reddit' already exists and is not an empt
   * handler для перезапуска puma
   * проверка и запуск `ansible-playbook reddit_app.yml --limit app --tags deploy-tag`
   * Проверка работы приложения ![App working][ansible2itsalive]
+  
 [ansible2itsalive]: ansible2itsalive.png "Ansible works"
 
 ### Один плейбук - несколько сценариев  
