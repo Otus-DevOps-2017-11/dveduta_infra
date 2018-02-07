@@ -341,3 +341,63 @@ ansible app -m command -a 'git clone https://github.com/Otus-DevOps-2017-11/redd
 appserver | FAILED | rc=128 >>
 fatal: destination path '/home/dveduta/reddit' already exists and is not an empty directory.non-zero return code
 ```
+
+## Домашняя работа 11
+### Один плейбук - один сценарий
+ * unit для mongod
+  * проверка `ansible-playbook reddit_app.yml --check --limit db`
+  * переменные - с дефолтным значением и без
+  * handler на рестарт mongod
+  * применение плейбука `ansible-playbook reddit_app.yml --limit db`
+ * Unit для приложения
+  * Сервис и handler для puma
+  * Таск для шаблона db_config
+  * тестовый прогон `ansible-playbook reddit_app.yml --check --limit app --tags app-tag`
+  * актуальный запуск `ansible-playbook reddit_app.yml  --limit app --tags app-tag`
+ * Деплой
+  * клонирование через модуль git и установка зависимостей через bundler
+  * handler для перезапуска puma
+  * проверка и запуск `ansible-playbook reddit_app.yml --limit app --tags deploy-tag`
+  * Проверка работы приложения ![App working][ansible2itsalive]
+[ansible2itsalive]: ansible2itsalive.png "Ansible works"
+
+### Один плейбук - несколько сценариев  
+ * Разделили исходный сценарий на 2
+  * Hosts и tags для каждого отдельный
+  * become: true для всего сценария
+ * Пересоздали виртуалки. Поправили айпишники в inventory
+ * Проверили и применили `ansible-playbook reddit_app2.yml --tags db-tag`
+ * Проверили и применили `ansible-playbook reddit_app2.yml --tags app-tag`
+ * Сделали сценарий для deploy, проверили и применили `ansible-playbook reddit_app2.yml --tags deploy-tag`. Приложение работает.
+
+### Несколько плейбуков
+  * переименовали предыдущие плейбуки
+  * разделили сценарии по файлам {app|db|deploy}.yml
+  * Сделали головной файл site.yml, проверили и применили плейбуки
+  `ansible-playbook site.yml` - приложение работает по внешнему адресу.
+
+### Провижининг в Packer
+ * Заменили bash-скрипты на плейбуки ansible
+ * пересоздали образы
+ ```
+==> Builds finished. The artifacts of successful builds are:
+--> googlecompute: A disk image was created: reddit-app-base-1517958565
+
+--> googlecompute: A disk image was created: reddit-db-base-1517958897
+```
+ * пересоздали stage
+```
+Apply complete! Resources: 6 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+app_external_ip = 146.148.7.110
+app_internal_ip = 10.132.0.3
+db_external_ip = 104.199.85.140
+db_internal_ip = 10.132.0.2
+```
+ * накатили плейбук `ansible-playbook site.yml`
+```
+appserver                  : ok=9    changed=7    unreachable=0    failed=0
+dbserver                   : ok=3    changed=2    unreachable=0    failed=0
+```
