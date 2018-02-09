@@ -359,7 +359,7 @@ fatal: destination path '/home/dveduta/reddit' already exists and is not an empt
   * handler для перезапуска puma
   * проверка и запуск `ansible-playbook reddit_app.yml --limit app --tags deploy-tag`
   * Проверка работы приложения ![App working][ansible2itsalive]
-  
+
 [ansible2itsalive]: ansible2itsalive.png "Ansible works"
 
 ### Один плейбук - несколько сценариев  
@@ -402,3 +402,25 @@ db_internal_ip = 10.132.0.2
 appserver                  : ok=9    changed=7    unreachable=0    failed=0
 dbserver                   : ok=3    changed=2    unreachable=0    failed=0
 ```
+
+## Домашняя работа 12
+* Создали роли app и db
+* Скопировали tasks, template, handler и variables из плейбука db в роль db
+* Аналогично заполнили роль app
+* Перевели плейбуки на роли
+* пересоздали виртуалки
+* применили плейбук и проверили работу приложения
+#### Окружения
+* Создали окружения stage и prod, внесли туда inventory
+* определили дефолтное окружение - stage
+* group_vars для stage и prod, задание переменной env
+* добавили вывод текущего окружения через debug
+* разложили файлы по папкам в соответствии с best practices
+* пересоздали виртуалки и проверили накатывание stage энва ансибла
+* приложение работает
+* Пересоздали виртуалки в prod окружении
+* применили ansible с прод окружением и проверили работоспособность приложения
+#### Коммьюнити роли
+* Добавили и поставили роль jdauphant.nginx
+* Добавила нстройки проксирования nginx на puma
+* пересоздали виртуалки stage, применили ansible, проверили работоспособность приложение на стандартном 80 порту
