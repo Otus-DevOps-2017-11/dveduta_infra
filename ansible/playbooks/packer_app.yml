@@ -2,16 +2,5 @@
 - name: ruby and bundler
   hosts: all
   become: true
-  tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-        
-    - name: ruby, bundler and build-essential
-      apt:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - "build-essential"
-        - "ruby-full"
-        - "ruby-bundler"
+  roles:
+   - app
